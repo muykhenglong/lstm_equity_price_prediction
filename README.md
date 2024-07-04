@@ -29,10 +29,26 @@ LSTM networks are a type of Recurrent Neural Network (RNN) capable of learning l
 ## LSTM Cell Structure
 An LSTM cell consists of three gates:
 
-* Forget Gate (f_t): Decides what information to throw away from the cell state. $f_t = \sigma(W_f*[h_{t-1}, x_t] + b_f)$
-* Input Gate (i_t): Decides which values from the input to update the cell state. $i_t = \sigma(W_i*[h_{t-1}, x_t] + b_i)$ 
-* Output Gate (o_t): Decides what to output based on the cell state. $C^{~}_t = tanh(W_C*[h_{t-1}, x_t] + b_c)$
+* Forget Gate (f_t): Decides what information to throw away from the cell state.
+* Input Gate (i_t): Decides which values from the input to update the cell state.
+* Output Gate (o_t): Decides what to output based on the cell state.
+  
 * The equations governing an LSTM cell are:
+* Forget gate:
+  $f_t = \sigma(W_f*[h_{t-1}, x_t] + b_f)$
+* Input gate:
+  $i_t = \sigma(W_i*[h_{t-1}, x_t] + b_i)$
+  $\hat{C_t} = tanh(W_C*[h_{t-1}, x_t] + b_c)$
+* Cell state update:
+  $C_t = f_t * C_{t-1} + i_t * \hat{C_t}$
+* Output gate:
+  $o_t = \sigma(W_o*[h_{t-1}, x_t] + b_o)$
+  $h_t = o_t * tanh(C_t)$
 
-
-
+where 
+* $\sigma$ is the sigmoid function.
+* $x_t$ is the input at time step t.
+* $h_{t-1}$ is the hidden state from the previous time step.
+* $C_{t-1}$ is the cell state from the previous time step.
+* $W_f, W_i, W_C, W_o$ are the weight matrices.
+* $b_f, b_i, b_C, b_o$ are the bias vectors.
