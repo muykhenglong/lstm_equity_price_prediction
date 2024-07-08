@@ -60,7 +60,18 @@ def plot_true_predict(stock_data, stock_data_close, timestep, scaler, train_pred
     plt.ylabel('Stock Price')
     plt.legend()
     plt.show()
+
+def predict_future(model, recent_data, timestep, scaler):
+    predictions = []
+    input_data = recent_data[-timestep:].reshape(1,timestep,1)
     
+    for _ in range(timestep):
+        next_pred = model.predict(input_data) 
+        predictions.append(next_pred)
+        input_data = np.append(input_data[:,1:,:], next_pred.reshape((1,1,1)), axis=1)
+        
+    return scaler.inverse_transform(np.array(predictions).reshape(-1,1))
+
 # Set random seeds for reproducibility
 random.seed(42)
 np.random.seed(42)
@@ -118,7 +129,7 @@ grid = GridSearchCV(estimator=model2, param_grid=param_grid, cv=3, n_jobs=-1)
 grid_result = grid.fit(X_train, Y_train)
 print(f'Best {grid_result.best_score_, grid_result.best_params_}')
 
-## Predict with best parameters
+## Predict on Test set with best parameters
 model = lstm_model(units=128, optimizer='adam') # Best (0.7803367735583784, {'batch_size': 32, 'epochs': 100, 'optimizer': 'adam', 'units': 128})
 model.fit(X_train,Y_train,validation_data = (X_test,Y_test), epochs=100, batch_size=32) 
 
@@ -128,12 +139,20 @@ train_predict = scaler.inverse_transform(train_predict)
 test_predict = model.predict(X_test)
 test_predict = scaler.inverse_transform(test_predict)
 
-## Print result
+### Print result
 print(math.sqrt(mean_squared_error(scaler.inverse_transform(Y_train),train_predict))) # 43.27050997902599
 print(math.sqrt(mean_squared_error(scaler.inverse_transform(Y_test),test_predict))) # 45.13355527829
 
 print(calculate_mape(scaler.inverse_transform(Y_train), train_predict)) # 0.7303206858935632
 print(calculate_mape(scaler.inverse_transform(Y_test), test_predict)) # 0.691487795188157
 
-## Plot the true stock data and predicted
+### Plot the true stock data and predicted
 plot_true_predict(stock_data, stock_data_close, timestep, scaler, train_predict, test_predict)
+
+## Predict into the future 
+future_predictions = predict_future(model, np.array(stock_data_close), timestep, scaler)
+
+futures_dates = pd.date_range(start=stock_data.index[-1] + dt.timedelta(1), periods=timestep, freq='B')
+future_predictions = pd.DataFrame(future_predictions, index=futures_dates, columns=['Predicted Close'])
+
+future_predictions.to_csv("future_predictions")
