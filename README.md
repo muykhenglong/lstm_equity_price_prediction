@@ -29,9 +29,9 @@ LSTM networks are a type of Recurrent Neural Network (RNN) capable of learning l
 ## LSTM Cell Structure
 An LSTM cell consists of three gates:
 
-* Forget Gate (f_t): Decides what information to throw away from the cell state.
-* Input Gate (i_t): Decides which values from the input to update the cell state.
-* Output Gate (o_t): Decides what to output based on the cell state.
+* Forget Gate $(f_t)$: Decides what information to throw away from the cell state.
+* Input Gate $(i_t)$: Decides which values from the input to update the cell state.
+* Output Gate $(o_t)$: Decides what to output based on the cell state.
   
 * The equations governing an LSTM cell are:
 * Forget gate:
